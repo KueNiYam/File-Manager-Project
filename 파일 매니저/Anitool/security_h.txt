@@ -1,0 +1,39 @@
+#ifndef SECURITY_H
+#define SECURITY_H
+
+#define ROOTID "ManSikKim"
+
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+const int check_logfile(const char *rkey)
+{
+	char *logfd, *dkey;
+	char buf[9] = { 0 };
+	int i;
+
+	if ((logfd = getenv("LOGFD")) == NULL) {
+		printf("You can't access it normally!!\n");
+		return -1;
+	}
+	if ((dkey = getenv("DEFAULT_KEY")) == NULL) {
+		printf("You can't access it normally!!\n");
+		return -1;
+	}
+
+	lseek(logfd[0], 0, SEEK_SET);
+	read(logfd[0], buf, 8);
+
+	for (i = 0; ((buf[i] ^ rkey[i]) == dkey[i]) && i < 8; i++);
+	if (i != 8) {
+		printf("You can't access it normally!!\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+#else
+#endif
